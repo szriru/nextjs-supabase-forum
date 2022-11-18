@@ -10,3 +10,6 @@ If you are trying something with this repo. You need to clone this repo and "npm
 NEXT_PUBLIC_SUPABASE_URL=@@@YOUR SUPABASE PROJECT URL@@@
 NEXT_PUBLIC_SUPABASE_ANON_KEY=@@@YOUR SUPABASE ANON KEY@@@
 ```
+
+## DEMO
+[https://nextjs-supabase-forum.vercel.app/](https://nextjs-supabase-forum.vercel.app/)
