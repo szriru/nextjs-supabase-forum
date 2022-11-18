@@ -7,42 +7,43 @@ type Profiles = Database['public']['Tables']['profiles']['Row']
 export default function Account({ session }: { session: Session }) {
   const supabase = useSupabaseClient<Database>()
   const user = useUser()
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState<boolean>(true)
   const [username, setUsername] = useState<Profiles['username']>(null)
   const [website, setWebsite] = useState<Profiles['website']>(null)
   const [avatar_url, setAvatarUrl] = useState<Profiles['avatar_url']>(null)
 
   useEffect(() => {
-    getProfile()
-  }, [session])
+    async function getProfile() {
+      try {
+        setLoading(true)
+        if (!user) throw new Error('No user')
 
-  async function getProfile() {
-    try {
-      setLoading(true)
-      if (!user) throw new Error('No user')
+        let { data, error, status } = await supabase
+          .from('profiles')
+          .select(`username, website, avatar_url`)
+          .eq('id', user.id)
+          .single()
 
-      let { data, error, status } = await supabase
-        .from('profiles')
-        .select(`username, website, avatar_url`)
-        .eq('id', user.id)
-        .single()
+        if (error && status !== 406) {
+          throw error
+        }
 
-      if (error && status !== 406) {
-        throw error
+        if (data) {
+          setUsername(data.username)
+          setWebsite(data.website)
+          setAvatarUrl(data.avatar_url)
+        }
+      } catch (error) {
+        alert('Error loading user data!')
+        console.log(error)
+      } finally {
+        setLoading(false)
       }
-
-      if (data) {
-        setUsername(data.username)
-        setWebsite(data.website)
-        setAvatarUrl(data.avatar_url)
-      }
-    } catch (error) {
-      alert('Error loading user data!')
-      console.log(error)
-    } finally {
-      setLoading(false)
     }
-  }
+    getProfile()
+  }, [session, user, supabase])
+
+
 
   async function updateProfile({
     username,
@@ -121,7 +122,7 @@ export default function Account({ session }: { session: Session }) {
               </td>
               <td>
                 <Avatar
-                  uid={user.id}
+                  uid={user?.id}
                   url={avatar_url}
                   size={150}
                   onUpload={(url) => {

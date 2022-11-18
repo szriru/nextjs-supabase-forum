@@ -6,6 +6,13 @@ export type Json =
   | { [key: string]: Json }
   | Json[]
 
+export interface Post {
+  id: number
+  created_at: string
+  from: string
+  content: string
+}
+
 export interface Database {
   public: {
     Tables: {

@@ -1,15 +1,20 @@
 import { useSessionContext, useSupabaseClient } from '@supabase/auth-helpers-react'
 import Link from 'next/link'
-import { useState, useEffect, useContext, useRef } from 'react'
+import React, { useState, useEffect, useContext, useRef } from 'react'
 import { ProfileContext } from "../pages/index"
+import { Post } from '../utils/database.types'
 
+interface IProps {
+    initialPosts: Post[]
+    initialError: boolean
+}
 
-const Board = ({ initialPosts, initialError }) => {
-    const [posts, setPosts] = useState<Array<Object> | null>(null)
+const Board = ({ initialPosts, initialError }: IProps) => {
+    const [posts, setPosts] = useState<Post[] | null>(null)
 
     useEffect(() => {
         setPosts([...initialPosts])
-    }, [])
+    }, [initialPosts])
 
     return (
         <>
@@ -55,9 +60,9 @@ const InputField = () => {
     const profile = useContext(ProfileContext)
     const supabase = useSupabaseClient()
     const commentRef = useRef<HTMLTextAreaElement | null>(null)
-    const handleSubmit = async (e) => {
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
-        const comment = commentRef?.current.value
+        const comment = commentRef?.current!.value
         try {
             let { error } = await supabase
                 .from('posts')
@@ -84,9 +89,8 @@ const InputField = () => {
                             <textarea
                                 className="bg-white rounded-lg border border-black p-2"
                                 ref={commentRef}
-                                rows="5"
-                                cols="60"
-                                type="text"
+                                rows={5}
+                                cols={60}
                                 placeholder="What are your thoughts?"
                             />
                             <button
